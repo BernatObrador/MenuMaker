@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Menu Maker</string>
+    <string name="defatul_web_client_id">223271111563-3rl1ptpefklq8s5ctombgc6qm7k4126u.apps.googleusercontent.com</string>
+    <string name="password">password</string>
+    <string name="sing_in">sing in</string>
+    <string name="sing_up">sing up</string>
+    <string name="user">user</string>
+    <string name="log_in">Menu Maker</string>
+    <string name="sign_in_with_google">Sign in with google</string>
+    <string name="user_text">User:</string>
+    <string name="log_out">Log out</string>
+    <string name="nombre">Nombre:</string>
+    <string name="colores">Colores:</string>
+    <string name="color1_color2_color3">color1, color2, color3</string>
+    <string name="upload">Upload</string>
+    <string name="ex_neo65">Ex: neo65</string>
+    <string name="or_log_in_with">Or log in with</string>
+    <string name="crear_menu">Crear menu</string>
+    <string name="pagina_principal">Pagina principal</string>
+    <string name="opciones">Options</string>
+    <string name="mostrar_platos">Mostrar platos</string>
+    <string name="nav_close">nav_close</string>
+    <string name="nav_open">nav_open</string>
+    <string name="main_page">Main page</string>
+    <string name="plates">Plates</string>
+</resources>
