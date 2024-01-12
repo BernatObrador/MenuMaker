@@ -31,9 +31,10 @@ import com.google.firebase.database.ValueEventListener;
 
 public class logged extends AppCompatActivity {
 
+    private User actualUser;
+    private ConectionBD conectionBD;
     private FirebaseUser user;
     private FirebaseDatabase database;
-    private GoogleSignInAccount account;
     private String userId;
     private DatabaseReference ref;
     private Toolbar toolbar;
@@ -64,6 +65,8 @@ public class logged extends AppCompatActivity {
         addUserToDb();
 
         ImageView addButon = findViewById(R.id.addButton);
+        conectionBD = new ConectionBD(database, userId);
+        updateUser();
 
         addButon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,6 +143,7 @@ public class logged extends AppCompatActivity {
                                 if (snapshot.exists()){
                                     dbr.child(plate).setValue("");
                                     Toast.makeText(logged.this, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
+                                    updateUser();
                                 }
                             }
 
@@ -159,6 +163,11 @@ public class logged extends AppCompatActivity {
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private void updateUser(){
+        conectionBD.getCategoriesFromDb();
+        actualUser = conectionBD.getUser();
     }
 
     private void addUserToDb(){
@@ -190,35 +199,4 @@ public class logged extends AppCompatActivity {
 
     }
 
-    /*
-    public void uploadTeclado(View view){
-        EditText nombre = findViewById(R.id.nombreTeclado);
-        EditText colores = findViewById(R.id.color);
-
-
-        ref.child(user.getEmail()).child("categorias").push().setValue("Arroz");
-            ref.child(user.getEmail()).child("categorias").push().setValue("Carne");
-            ref.child(user.getEmail()).child("categorias").push().setValue("Pasta");
-            ref.child(user.getEmail()).child("categorias").push().setValue("Pecado");
-            ref.child(user.getEmail()).child("categorias").push().setValue("Legumbres");
-
-        String name = nombre.getText().toString();
-        String color = colores.getText().toString();
-
-        if(!name.isEmpty() && !color.isEmpty()){
-            String[] listaColores = color.split(",");
-            ref.child(name).push();
-
-            for(String s : listaColores){
-                ref.child(name).child("colores").push().setValue(s);
-            }
-
-            nombre.setText("");
-            colores.setText("");
-
-            Toast.makeText(this, "Teclado subido correctamente", Toast.LENGTH_SHORT).show();
-        }
-
-    }
-     */
 }
