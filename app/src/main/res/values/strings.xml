@@ -23,4 +23,7 @@
     <string name="nav_open">nav_open</string>
     <string name="main_page">Main page</string>
     <string name="plates">Plates</string>
+    <string name="placeholder">placeHolder</string>
+    <string name="plato">Plato:</string>
+    <string name="categoria">Categoria:</string>
 </resources>

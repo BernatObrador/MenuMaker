@@ -6,6 +6,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +30,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.io.Serializable;
 
 public class logged extends AppCompatActivity {
 
@@ -74,6 +78,9 @@ public class logged extends AppCompatActivity {
                 addPlate();
             }
         });
+
+
+
     }
 
     private void logOut() {
@@ -111,7 +118,9 @@ public class logged extends AppCompatActivity {
                 return true;
             }
             if(item.getItemId() == (R.id.mostrarPlatos)) {
-                startActivity(new Intent(this, Recipes.class));
+                Intent intent = new Intent(this, Recipes.class);
+                intent.putExtra("connection", conectionBD);
+                startActivity(intent);
             }
 
             return true;

@@ -10,12 +10,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class ConectionBD {
-    private FirebaseDatabase database;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ConectionBD implements Serializable {
+    private static FirebaseDatabase database;
     private User user;
 
     public ConectionBD(FirebaseDatabase database, String userId) {
-        this.database = database;
+        ConectionBD.database = database;
+        user = new User();
+        user.setUserId(userId);
+        getCategoriesFromDb();
+    }
+
+    public ConectionBD(String userId) {
         user = new User();
         user.setUserId(userId);
         getCategoriesFromDb();
@@ -27,16 +37,19 @@ public class ConectionBD {
         dbr.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Category category = null;
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    category = new Category(dataSnapshot.getKey());
-                    for(DataSnapshot snapshot1 : dataSnapshot.getChildren()){
-                        category.addPlate(snapshot1.getKey());
+                List<Plate> plates = new ArrayList<>();
+                Plate plate = null;
+                //Category category = null;
+                for(DataSnapshot categoria : snapshot.getChildren()){
+                    //category = new Category(categoria.getKey());
+                    for(DataSnapshot plato : categoria.getChildren()){
+                        plates.add(new Plate(categoria.getKey(), plato.getKey()));
+                        //category.addPlate(plato.getKey());
                     }
-                    user.addCategory(category);
+                    //user.addCategory(category);
                 }
-
-                Log.d("Categ", user.getCategories().toString());
+                user.setPlates(plates);
+                Log.d("plates from connection", user.getPlates().toString());
             }
 
             @Override

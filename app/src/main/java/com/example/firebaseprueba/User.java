@@ -1,25 +1,27 @@
 package com.example.firebaseprueba;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
     private String userId;
     private String email;
-    private List<Category> categories;
+    //private List<Category> categories;
+    private List<Plate> plates;
 
     public User() {
-        categories = new ArrayList<>();
+        //categories = new ArrayList<>();
+        plates = new ArrayList<>();
     }
 
-    public User(String userId, String email, List<Category> categories) {
+    public User(String userId, String email) {
         this.userId = userId;
         this.email = email;
-        this.categories = categories;
     }
 
-    public void addCategory(Category category){
-        this.categories.add(category);
+    public void addPlate(Plate plate){
+        this.plates.add(plate);
     }
 
     public String getUserId() {
@@ -30,19 +32,19 @@ public class User {
         this.userId = userId;
     }
 
+    public List<Plate> getPlates() {
+        return plates;
+    }
+
+    public void setPlates(List<Plate> plates) {
+        this.plates = plates;
+    }
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public List<Category> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
     }
 }
