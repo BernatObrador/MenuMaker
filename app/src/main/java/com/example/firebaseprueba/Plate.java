@@ -1,6 +1,8 @@
 package com.example.firebaseprueba;
 
-public class Plate implements Comparable<Plate> {
+import java.io.Serializable;
+
+public class Plate implements Comparable<Plate>, Serializable {
     private String name;
     private String category;
 

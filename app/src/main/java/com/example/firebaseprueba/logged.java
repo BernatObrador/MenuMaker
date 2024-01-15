@@ -2,13 +2,14 @@ package com.example.firebaseprueba;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -127,7 +128,63 @@ public class logged extends AppCompatActivity {
         });
     }
 
-    public void addPlate(){
+    public void addPlate() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View dialogView = layoutInflater.inflate(R.layout.upload_plate, null);
+
+        builder.setView(dialogView).setTitle("Agregar plato")
+                .setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EditText categoria = dialogView.findViewById(R.id.textCategoria);
+                        EditText plato = dialogView.findViewById(R.id.textPlato);
+
+                        String cat = String.valueOf(categoria.getText()).toLowerCase().trim();
+                        String plate = String.valueOf(plato.getText()).trim();
+
+                        if (cat.isEmpty() || plate.isEmpty()) {
+                            Toast.makeText(logged.this, "Ingrese una categoría y un plato válidos", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        DatabaseReference categoriaRef = ref.child(userId).child("categorias").child(cat);
+
+                        categoriaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    if (snapshot.child(plate).exists()) {
+                                        Toast.makeText(logged.this, "El plato ya existe en esta categoría", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        categoriaRef.child(plate).setValue("");
+                                        Toast.makeText(logged.this, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
+                                        updateUser();
+                                    }
+                                } else {
+                                    Toast.makeText(logged.this, "La categoría no existe", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Toast.makeText(logged.this, "Fallo en la subida del plato", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    /*public void addPlate(){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater layoutInflater = this.getLayoutInflater();
@@ -172,7 +229,7 @@ public class logged extends AppCompatActivity {
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-    }
+    }*/
 
     private void updateUser(){
         conectionBD.getCategoriesFromDb();
@@ -201,11 +258,6 @@ public class logged extends AppCompatActivity {
 
                 }
             });
-
-            // Ponemos la raiz de la base de datos en el usuario
-        //ref = database.getReference(userId);
-
-
     }
 
 }

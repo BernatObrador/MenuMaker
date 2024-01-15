@@ -1,6 +1,7 @@
 package com.example.firebaseprueba;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,8 +48,8 @@ public class RecyclerViewAdapterPlate extends RecyclerView.Adapter<RecyclerViewA
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
-            plato = itemView.findViewById(R.id.textPlato);
-            categoria = itemView.findViewById(R.id.textCategoria);
+            plato = itemView.findViewById(R.id.nombrePlato);
+            categoria = itemView.findViewById(R.id.nombreCat);
         }
     }
 }
