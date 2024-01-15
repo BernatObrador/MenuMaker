@@ -20,6 +20,15 @@ public class User implements Serializable {
         this.email = email;
     }
 
+    public int getPositionPlate(String plate, String cat){
+        for(int i = 0; i < plates.size(); i++){
+            if(plates.get(i).getCategory().equals(cat) && plates.get(i).getName().equals(plate)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public void addPlate(Plate plate){
         this.plates.add(plate);
     }

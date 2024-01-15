@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -32,12 +33,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
 
 public class logged extends AppCompatActivity {
-
-    private User actualUser;
     private ConectionBD conectionBD;
+    private GenerateMenu generateMenu;
     private FirebaseUser user;
     private FirebaseDatabase database;
     private String userId;
@@ -71,7 +75,16 @@ public class logged extends AppCompatActivity {
 
         ImageView addButon = findViewById(R.id.addButton);
         conectionBD = new ConectionBD(database, userId);
-        updateUser();
+        HashMap<String, Integer> categories = new HashMap<>();
+        categories.put("arroz", 2);
+        categories.put("carne", 2);
+        categories.put("pasta", 1);
+        conectionBD.getCategoriesFromDb(new ConectionBD.OnDataLoadedListener() {
+            @Override
+            public void onDataLoaded() {
+                generateMenu = new GenerateMenu(conectionBD.getUser(), conectionBD.getCountCategories(), categories, conectionBD);
+            }
+        });
 
         addButon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,8 +93,38 @@ public class logged extends AppCompatActivity {
             }
         });
 
+    }
 
+    public void generateMenu(View view) {
+        if(conectionBD.getUser().getPlates().size() > 0) {
+            TextView textMenu = findViewById(R.id.menu);
 
+            List<Plate> menu = generateMenu.getMenuForCat();
+
+            String menuTxt = "";
+            for (int i = 0; i < menu.size(); i++) {
+                switch (i) {
+                    case 0:
+                        menuTxt += "Lunes : " + menu.get(i).getName() + "\n";
+                        break;
+                    case 1:
+                        menuTxt += "Martes : " + menu.get(i).getName() + "\n";
+                        break;
+                    case 2:
+                        menuTxt += "Miércoles : " + menu.get(i).getName() + "\n";
+                        break;
+                    case 3:
+                        menuTxt += "Jueves : " + menu.get(i).getName() + "\n";
+                        break;
+                    case 4:
+                        menuTxt += "Viernes : " + menu.get(i).getName() + "\n";
+                        break;
+
+                }
+            }
+
+            textMenu.setText(menuTxt);
+        }
     }
 
     private void logOut() {
@@ -105,20 +148,20 @@ public class logged extends AppCompatActivity {
                 });
     }
 
-    private void menu(){
+    private void menu() {
 
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.nav_open, R.string.nav_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(item ->{
+        navigationView.setNavigationItemSelectedListener(item -> {
 
-            if(item.getItemId() == (R.id.logOut)){
+            if (item.getItemId() == (R.id.logOut)) {
                 logOut();
                 return true;
             }
-            if(item.getItemId() == (R.id.mostrarPlatos)) {
+            if (item.getItemId() == (R.id.mostrarPlatos)) {
                 Intent intent = new Intent(this, Recipes.class);
                 intent.putExtra("connection", conectionBD);
                 startActivity(intent);
@@ -231,33 +274,32 @@ public class logged extends AppCompatActivity {
         alertDialog.show();
     }*/
 
-    private void updateUser(){
+    private void updateUser() {
         conectionBD.getCategoriesFromDb();
-        actualUser = conectionBD.getUser();
     }
 
-    private void addUserToDb(){
+    private void addUserToDb() {
 
         // El id del usuario sera su correo hasta el @, que si lo pongo entero da error por el . del correo
         userId = user.getEmail().substring(0, user.getEmail().indexOf("@"));
 
-            ref.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(!snapshot.exists()){
-                        ref.child(userId).child("categorias").child("pasta").setValue("");
-                        ref.child(userId).child("categorias").child("legumbres").setValue("");
-                        ref.child(userId).child("categorias").child("carne").setValue("");
-                        ref.child(userId).child("categorias").child("pescado").setValue("");
-                        ref.child(userId).child("categorias").child("arroz").setValue("");
-                    }
+        ref.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    ref.child(userId).child("categorias").child("pasta").setValue("");
+                    ref.child(userId).child("categorias").child("legumbres").setValue("");
+                    ref.child(userId).child("categorias").child("carne").setValue("");
+                    ref.child(userId).child("categorias").child("pescado").setValue("");
+                    ref.child(userId).child("categorias").child("arroz").setValue("");
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
+            }
+        });
     }
 
 }

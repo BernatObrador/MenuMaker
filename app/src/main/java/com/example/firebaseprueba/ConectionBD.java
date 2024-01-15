@@ -78,7 +78,6 @@ public class ConectionBD implements Serializable {
                     //user.addCategory(category);
                 }
                 user.setPlates(plates);
-                Log.d("plates from connection", user.getPlates().toString());
 
                 if (listener != null) {
                     listener.onDataLoaded();
@@ -90,6 +89,52 @@ public class ConectionBD implements Serializable {
 
             }
         });
+    }
+
+    public int getCountCategories(){
+
+        DatabaseReference dbr = database.getReference("MenuMaker").child(user.getUserId()).child("categorias");
+        final int[] countCat = {0};
+        dbr.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot categoria : snapshot.getChildren()){
+                    countCat[0]++;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        return countCat[0];
+    }
+
+    public int getCountCategories(String cat){
+
+        DatabaseReference dbr = database.getReference("MenuMaker").child(user.getUserId()).child("categorias").child(cat);
+        final int[] countCat = {0};
+        dbr.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot categoria : snapshot.getChildren()){
+                    countCat[0]++;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        return countCat[0];
     }
 
 

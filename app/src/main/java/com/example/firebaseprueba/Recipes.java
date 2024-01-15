@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,11 +24,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Recipes extends AppCompatActivity {
     private ConectionBD conectionBD;
     private User actualUser;
+    private List<Plate> plates;
+    private FirebaseDatabase database;
+    private DatabaseReference ref;
+    private RecyclerViewAdapterPlate recyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,14 +41,16 @@ public class Recipes extends AppCompatActivity {
         setContentView(R.layout.activity_recipes);
 
 
-
-
         conectionBD = (ConectionBD) getIntent().getExtras().get("connection");
+        database = ConectionBD.getDatabase();
+        ref = database.getReference("MenuMaker");
 
         conectionBD.getCategoriesFromDb(new ConectionBD.OnDataLoadedListener() {
             @Override
             public void onDataLoaded() {
                 startComponents();
+                actualUser = conectionBD.getUser();
+                plates = actualUser.getPlates();
                 updateUi();
             }
         });
@@ -54,13 +62,20 @@ public class Recipes extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         NavigationView navigationView = findViewById(R.id.navView);
         Utilities.setupMenu(this, toolbar, drawerLayout, navigationView, conectionBD);
-        addPlate();
+        FloatingActionButton addButon = findViewById(R.id.addButton);
+        addButon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addPlate();
+            }
+        });
+
 
     }
 
     private void updateUi(){
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        RecyclerViewAdapterPlate recyclerViewAdapter = new RecyclerViewAdapterPlate(this, conectionBD.getUser().getPlates());
+        recyclerViewAdapter = new RecyclerViewAdapterPlate(this, plates);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -69,7 +84,6 @@ public class Recipes extends AppCompatActivity {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         View dialogView = layoutInflater.inflate(R.layout.upload_plate, null);
-        DatabaseReference ref = ConectionBD.getDatabase().getReference();
         String userId = conectionBD.getUser().getUserId();
 
         builder.setView(dialogView).setTitle("Agregar plato")
@@ -97,8 +111,9 @@ public class Recipes extends AppCompatActivity {
                                         Toast.makeText(Recipes.this, "El plato ya existe en esta categoría", Toast.LENGTH_SHORT).show();
                                     } else {
                                         categoriaRef.child(plate).setValue("");
+                                        plates.add(new Plate(plate, cat));
                                         Toast.makeText(Recipes.this, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
-                                        updateUser();
+                                        recyclerViewAdapter.notifyItemInserted(plates.size() - 1);
                                     }
                                 } else {
                                     Toast.makeText(Recipes.this, "La categoría no existe", Toast.LENGTH_SHORT).show();
@@ -121,9 +136,5 @@ public class Recipes extends AppCompatActivity {
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-    }
-
-    private void updateUser(){
-        conectionBD.getCategoriesFromDb();
     }
 }

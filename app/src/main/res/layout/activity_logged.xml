@@ -53,9 +53,17 @@
                     android:layout_width="85dp"
                     android:layout_height="78dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/menu_button" />
+                    android:src="@drawable/menu_button"
+                    android:onClick="generateMenu"/>
 
             </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                />
 
 
         </LinearLayout>
