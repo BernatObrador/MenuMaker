@@ -1,6 +1,8 @@
 package com.example.firebaseprueba;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -161,6 +163,35 @@ public class ConectionBD implements Serializable {
         });
 
         return cat;
+    }
+
+    public void agregarPlato(String plate, String cat, DatabaseReference categoriaRef, Context context){
+        if (cat.isEmpty() || plate.isEmpty()) {
+            Toast.makeText(context, "Ingrese una categoría y un plato válidos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        categoriaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    if (snapshot.child(plate).exists()) {
+                        Toast.makeText(context, "El plato ya existe en esta categoría", Toast.LENGTH_SHORT).show();
+                    } else {
+                        categoriaRef.child(plate).setValue("");
+                        Toast.makeText(context, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
+                        getCategoriesFromDb();
+                    }
+                } else {
+                    Toast.makeText(context, "La categoría no existe", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 

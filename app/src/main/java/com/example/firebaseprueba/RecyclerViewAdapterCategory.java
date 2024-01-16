@@ -1,5 +1,6 @@
 package com.example.firebaseprueba;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,15 +13,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.w3c.dom.Text;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerViewAdapterCategory.MyHolder> {
     private Context context;
     private List<String> categories;
+    private onQuantityChangeListener quantityChangeListener;
 
-    public RecyclerViewAdapterCategory(Context context, List<String> categories) {
+    public RecyclerViewAdapterCategory(Context context, List<String> categories, onQuantityChangeListener listener) {
         this.context = context;
         this.categories = categories;
+        this.quantityChangeListener = listener;
     }
 
     @NonNull
@@ -33,14 +37,15 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerViewAdapterCategory.MyHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerViewAdapterCategory.MyHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.nombreCat.setText(categories.get(position));
 
         holder.arrowUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int qunatity = sumQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
-                holder.cantidadCat.setText(String.valueOf(qunatity));
+                int quantity = sumQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
+                holder.cantidadCat.setText(String.valueOf(quantity));
+                quantityChangeListener.onQuantityIncreased(categories.get(position), Integer.parseInt(holder.cantidadCat.getText().toString()));
             }
         });
 
@@ -49,6 +54,7 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
             public void onClick(View v) {
                 int qunatity = downQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
                 holder.cantidadCat.setText(String.valueOf(qunatity));
+                quantityChangeListener.onQuantityDecreased(categories.get(position), Integer.parseInt(holder.cantidadCat.getText().toString()));
             }
         });
     }
@@ -70,6 +76,7 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
 
         return numero;
     }
+
 
     @Override
     public int getItemCount() {

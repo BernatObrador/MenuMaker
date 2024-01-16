@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class logged extends AppCompatActivity {
+public class logged extends AppCompatActivity implements onQuantityChangeListener{
     private ConectionBD conectionBD;
     private GenerateMenu generateMenu;
     private FirebaseUser user;
@@ -55,6 +55,7 @@ public class logged extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private List<String> categories;
+    private HashMap<String, Integer> cantidadCat;
     private RecyclerViewAdapterCategory recyclerViewAdapter;
 
     @Override
@@ -71,6 +72,7 @@ public class logged extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         ref = database.getReference("MenuMaker");
 
+        cantidadCat = new HashMap<>();
 
         drawerLayout = findViewById(R.id.drawerLayout);
         toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.toolbar);
@@ -115,7 +117,7 @@ public class logged extends AppCompatActivity {
             categories.put("carne", 2);
             categories.put("pescado", 1);
 
-            List<Plate> menu = generateMenu.getMenuForCat(categories);
+            List<Plate> menu = generateMenu.getMenuForCat(cantidadCat);
 
             String menuTxt = "";
             for (int i = 0; i < menu.size(); i++) {
@@ -180,13 +182,11 @@ public class logged extends AppCompatActivity {
                         String cat = getCategoryFromSpinner.get(0);
                         String plate = String.valueOf(plato.getText()).trim();
 
-                        if (cat.isEmpty() || plate.isEmpty()) {
-                            Toast.makeText(logged.this, "Ingrese una categoría y un plato válidos", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
 
                         DatabaseReference categoriaRef = ref.child(userId).child("categorias").child(cat);
 
+                        conectionBD.agregarPlato(plate, cat, categoriaRef, logged.this);
+                        /*
                         categoriaRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -208,6 +208,8 @@ public class logged extends AppCompatActivity {
                                 Toast.makeText(logged.this, "Fallo en la subida del plato", Toast.LENGTH_SHORT).show();
                             }
                         });
+
+ */
                     }
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -262,9 +264,18 @@ public class logged extends AppCompatActivity {
 
     private void setUpRecyclerView(){
         RecyclerView recyclerView = findViewById(R.id.recyclerCategories);
-        recyclerViewAdapter = new RecyclerViewAdapterCategory(this, categories);
+        recyclerViewAdapter = new RecyclerViewAdapterCategory(this, categories, this);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    @Override
+    public void onQuantityIncreased(String category, int newQuantity) {
+        cantidadCat.put(category, newQuantity);
+    }
+
+    @Override
+    public void onQuantityDecreased(String category, int newQuantity) {
+        cantidadCat.put(category, newQuantity);
+    }
 }
