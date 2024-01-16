@@ -7,24 +7,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
-
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerViewAdapterCategory.MyHolder> {
     private Context context;
     private List<String> categories;
-    private onQuantityChangeListener quantityChangeListener;
+    private HashMap<String, Integer> cantidadCat;
 
-    public RecyclerViewAdapterCategory(Context context, List<String> categories, onQuantityChangeListener listener) {
+    public RecyclerViewAdapterCategory(Context context, List<String> categories) {
         this.context = context;
         this.categories = categories;
-        this.quantityChangeListener = listener;
+        this.cantidadCat = new HashMap<>();
     }
 
     @NonNull
@@ -43,9 +43,13 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
         holder.arrowUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int quantity = sumQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
-                holder.cantidadCat.setText(String.valueOf(quantity));
-                quantityChangeListener.onQuantityIncreased(categories.get(position), Integer.parseInt(holder.cantidadCat.getText().toString()));
+                if (cantidadDePlatos() < 5) {
+                    int quantity = sumQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
+                    holder.cantidadCat.setText(String.valueOf(quantity));
+                    cantidadCat.put(categories.get(position), Integer.parseInt(holder.cantidadCat.getText().toString()));
+                } else {
+                    Toast.makeText(context, "No puedes poner mas de 5 platos.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -54,7 +58,7 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
             public void onClick(View v) {
                 int qunatity = downQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
                 holder.cantidadCat.setText(String.valueOf(qunatity));
-                quantityChangeListener.onQuantityDecreased(categories.get(position), Integer.parseInt(holder.cantidadCat.getText().toString()));
+                cantidadCat.put(categories.get(position), Integer.parseInt(holder.cantidadCat.getText().toString()));
             }
         });
     }
@@ -77,6 +81,18 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
         return numero;
     }
 
+    public int cantidadDePlatos(){
+        int count = 0;
+
+        for(Map.Entry<String, Integer> entry : cantidadCat.entrySet()) {
+            count += entry.getValue();
+        }
+        return count;
+    }
+
+    public HashMap<String, Integer> getCantidadCat() {
+        return cantidadCat;
+    }
 
     @Override
     public int getItemCount() {

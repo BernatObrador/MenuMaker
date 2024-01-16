@@ -41,10 +41,11 @@ import org.w3c.dom.Text;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class logged extends AppCompatActivity implements onQuantityChangeListener{
+public class logged extends AppCompatActivity {
     private ConectionBD conectionBD;
     private GenerateMenu generateMenu;
     private FirebaseUser user;
@@ -55,7 +56,6 @@ public class logged extends AppCompatActivity implements onQuantityChangeListene
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private List<String> categories;
-    private HashMap<String, Integer> cantidadCat;
     private RecyclerViewAdapterCategory recyclerViewAdapter;
 
     @Override
@@ -72,7 +72,6 @@ public class logged extends AppCompatActivity implements onQuantityChangeListene
         database = FirebaseDatabase.getInstance();
         ref = database.getReference("MenuMaker");
 
-        cantidadCat = new HashMap<>();
 
         drawerLayout = findViewById(R.id.drawerLayout);
         toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.toolbar);
@@ -80,7 +79,6 @@ public class logged extends AppCompatActivity implements onQuantityChangeListene
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         addUserToDb();
-
 
 
         ImageView addButon = findViewById(R.id.addButton);
@@ -110,15 +108,10 @@ public class logged extends AppCompatActivity implements onQuantityChangeListene
     }
 
     public void generateMenu(View view) {
-        if(conectionBD.getUser().getPlates().size() > 0) {
+        if (conectionBD.getUser().getPlates().size() > 0) {
             TextView textMenu = findViewById(R.id.menu);
-            HashMap<String, Integer> categories = new HashMap<>();
-            categories.put("arroz", 2);
-            categories.put("carne", 2);
-            categories.put("pescado", 1);
-
-            List<Plate> menu = generateMenu.getMenuForCat(cantidadCat);
-
+            List<Plate> menu = generateMenu.getMenuForCat(recyclerViewAdapter.getCantidadCat());
+            Collections.shuffle(menu);
             String menuTxt = "";
             for (int i = 0; i < menu.size(); i++) {
                 switch (i) {
@@ -142,6 +135,8 @@ public class logged extends AppCompatActivity implements onQuantityChangeListene
             }
 
             textMenu.setText(menuTxt);
+        } else {
+            Toast.makeText(logged.this, "No tienes platos para crear el menu.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -227,7 +222,7 @@ public class logged extends AppCompatActivity implements onQuantityChangeListene
         conectionBD.getCategoriesFromDb();
     }
 
-    public void setupSpinner(List<String> categories, Spinner spinner){
+    public void setupSpinner(List<String> categories, Spinner spinner) {
         ArrayAdapter<String> adapterCategories = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
@@ -262,20 +257,10 @@ public class logged extends AppCompatActivity implements onQuantityChangeListene
         });
     }
 
-    private void setUpRecyclerView(){
+    private void setUpRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.recyclerCategories);
-        recyclerViewAdapter = new RecyclerViewAdapterCategory(this, categories, this);
+        recyclerViewAdapter = new RecyclerViewAdapterCategory(this, categories);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-    }
-
-    @Override
-    public void onQuantityIncreased(String category, int newQuantity) {
-        cantidadCat.put(category, newQuantity);
-    }
-
-    @Override
-    public void onQuantityDecreased(String category, int newQuantity) {
-        cantidadCat.put(category, newQuantity);
     }
 }

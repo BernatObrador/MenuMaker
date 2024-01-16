@@ -21,11 +21,13 @@ public class GenerateMenu {
         List<Plate> plates = user.getPlates();
         List<Plate> menu = new ArrayList<>();
 
+        //Almacenamos las categorias de los platos
         for(Plate plate : plates){
             String cat = plate.getCategory();
             categories.put(cat, new ArrayList<>());
         }
 
+        //Almacenamos los platos en sus respectivas categorias
         for(Plate plate: plates){
             for(Map.Entry<String, List<Plate>> entry : categories.entrySet()){
                 String cat = entry.getKey();
@@ -35,6 +37,7 @@ public class GenerateMenu {
             }
         }
 
+        //Creamos el menu con la cantidad de platos de cada categoria
         for(Map.Entry<String, Integer> entry : cantidadPorCategoria.entrySet()){
             String cat = entry.getKey();
             int cantidad = entry.getValue();

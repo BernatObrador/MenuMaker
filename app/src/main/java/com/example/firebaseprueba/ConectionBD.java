@@ -1,7 +1,6 @@
 package com.example.firebaseprueba;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,7 +11,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.checkerframework.checker.units.qual.A;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -45,14 +43,10 @@ public class ConectionBD implements Serializable {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Plate> plates = new ArrayList<>();
                 Plate plate = null;
-                //Category category = null;
                 for(DataSnapshot categoria : snapshot.getChildren()){
-                    //category = new Category(categoria.getKey());
                     for(DataSnapshot plato : categoria.getChildren()){
                         plates.add(new Plate(plato.getKey(), categoria.getKey()));
-                        //category.addPlate(plato.getKey());
                     }
-                    //user.addCategory(category);
                 }
                 user.setPlates(plates);
             }
