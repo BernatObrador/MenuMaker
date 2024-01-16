@@ -11,22 +11,12 @@ public class GenerateMenu {
 
     private User user;
     private ConectionBD conectionBD;
-    private int cantidadCatregories;
-    private HashMap<String, Integer> cantidadPorCategoria;
-    private final int diasDeMenu = 5;
 
-    public GenerateMenu(User user, int cantidadCatregories) {
+    public GenerateMenu(User user , ConectionBD conectionBD) {
         this.user = user;
-        this.cantidadCatregories = cantidadCatregories;
-    }
-
-    public GenerateMenu(User user, int cantidadCatregories, HashMap<String, Integer> cantidadPorCategoria, ConectionBD conectionBD) {
-        this.user = user;
-        this.cantidadCatregories = cantidadCatregories;
-        this.cantidadPorCategoria = cantidadPorCategoria;
         this.conectionBD = conectionBD;
     }
-    public List<Plate> getMenuForCat(){
+    public List<Plate> getMenuForCat(HashMap<String, Integer> cantidadPorCategoria){
         HashMap<String, List<Plate>> categories = new HashMap<>();
         List<Plate> plates = user.getPlates();
         List<Plate> menu = new ArrayList<>();
@@ -65,39 +55,11 @@ public class GenerateMenu {
         return menu;
     }
 
-
-    public List<Plate> getMenu(){
-        List<Plate> plates = user.getPlates();
-        List<Plate> menu = new ArrayList<>();
-        int cantidad = 0;
-
-        while (cantidad < diasDeMenu){
-            int posPlate = (int) (Math.random() * plates.size());
-
-            while (menu.contains(plates.get(posPlate))){
-                posPlate = (int) (Math.random() * plates.size() - 1);
-            }
-
-            menu.add(plates.get(posPlate));
-            cantidad++;
-        }
-
-        return menu;
-    }
-
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public int getCantidadCatregories() {
-        return cantidadCatregories;
-    }
-
-    public void setCantidadCatregories(int cantidadCatregories) {
-        this.cantidadCatregories = cantidadCatregories;
     }
 }

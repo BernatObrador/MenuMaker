@@ -80,61 +80,6 @@ public class Utilities {
         });
     }
 
-    public static void showAddPlateDialog(Context context, DatabaseReference ref, String userId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        LayoutInflater layoutInflater = LayoutInflater.from(context);
-        View dialogView = layoutInflater.inflate(R.layout.upload_plate, null);
-
-        builder.setView(dialogView).setTitle("Agregar plato")
-                .setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EditText categoria = dialogView.findViewById(R.id.textCategoria);
-                        EditText plato = dialogView.findViewById(R.id.textPlato);
-
-                        String cat = String.valueOf(categoria.getText()).toLowerCase().trim();
-                        String plate = String.valueOf(plato.getText()).trim();
-
-                        if (cat.isEmpty() || plate.isEmpty()) {
-                            Toast.makeText(context, "Ingrese una categoría y un plato válidos", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        DatabaseReference categoriaRef = ref.child(userId).child("categorias").child(cat);
-
-                        categoriaRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.exists()) {
-                                    if (snapshot.child(plate).exists()) {
-                                        Toast.makeText(context, "El plato ya existe en esta categoría", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        categoriaRef.child(plate).setValue("");
-                                        Toast.makeText(context, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Toast.makeText(context, "La categoría no existe", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                Toast.makeText(context, "Fallo en la subida del plato", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                })
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
     private static User updateUser(ConectionBD connectionBD){
         connectionBD.getCategoriesFromDb();
         return connectionBD.getUser();

@@ -63,8 +63,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                />
+                android:textSize="16sp"
+                android:textAlignment="center"/>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerCategories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </androidx.recyclerview.widget.RecyclerView>
 
         </LinearLayout>
 
@@ -76,6 +83,7 @@
             app:headerLayout="@layout/header"
             app:menu="@menu/top_menu"
             tools:ignore="MissingConstraints" />
+
 
     </androidx.drawerlayout.widget.DrawerLayout>
 

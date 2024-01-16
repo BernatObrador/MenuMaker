@@ -10,6 +10,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,6 +137,30 @@ public class ConectionBD implements Serializable {
         });
 
         return countCat[0];
+    }
+
+    public List<String> getNameCategories(OnDataLoadedListener listener){
+        DatabaseReference dbr = database.getReference("MenuMaker").child(user.getUserId()).child("categorias");
+        List<String> cat = new ArrayList<>();
+        dbr.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot categoria : snapshot.getChildren()){
+                    cat.add(categoria.getKey());
+                }
+                if(listener != null){
+                    listener.onDataLoaded();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        return cat;
     }
 
 

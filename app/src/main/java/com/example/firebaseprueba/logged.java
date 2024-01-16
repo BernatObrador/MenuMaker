@@ -13,10 +13,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.w3c.dom.Text;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,6 +54,7 @@ public class logged extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private List<String> categories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +62,7 @@ public class logged extends AppCompatActivity {
         setContentView(R.layout.activity_logged);
 
         startComponenets();
-        menu();
-
+        Utilities.setupMenu(this, toolbar, drawerLayout, navigationView, conectionBD);
 
     }
 
@@ -75,14 +80,11 @@ public class logged extends AppCompatActivity {
 
         ImageView addButon = findViewById(R.id.addButton);
         conectionBD = new ConectionBD(database, userId);
-        HashMap<String, Integer> categories = new HashMap<>();
-        categories.put("arroz", 2);
-        categories.put("carne", 2);
-        categories.put("pasta", 1);
+
         conectionBD.getCategoriesFromDb(new ConectionBD.OnDataLoadedListener() {
             @Override
             public void onDataLoaded() {
-                generateMenu = new GenerateMenu(conectionBD.getUser(), conectionBD.getCountCategories(), categories, conectionBD);
+                generateMenu = new GenerateMenu(conectionBD.getUser(), conectionBD);
             }
         });
 
@@ -98,8 +100,12 @@ public class logged extends AppCompatActivity {
     public void generateMenu(View view) {
         if(conectionBD.getUser().getPlates().size() > 0) {
             TextView textMenu = findViewById(R.id.menu);
+            HashMap<String, Integer> categories = new HashMap<>();
+            categories.put("arroz", 2);
+            categories.put("carne", 2);
+            categories.put("pescado", 1);
 
-            List<Plate> menu = generateMenu.getMenuForCat();
+            List<Plate> menu = generateMenu.getMenuForCat(categories);
 
             String menuTxt = "";
             for (int i = 0; i < menu.size(); i++) {
@@ -127,63 +133,41 @@ public class logged extends AppCompatActivity {
         }
     }
 
-    private void logOut() {
-        FirebaseAuth.getInstance().signOut();
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.sign_in_with_google))
-                .requestEmail()
-                .build();
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(this, MainActivity.class);
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(this, "Failed at logging out", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void menu() {
-
-        setSupportActionBar(toolbar);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.nav_open, R.string.nav_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView.setNavigationItemSelectedListener(item -> {
-
-            if (item.getItemId() == (R.id.logOut)) {
-                logOut();
-                return true;
-            }
-            if (item.getItemId() == (R.id.mostrarPlatos)) {
-                Intent intent = new Intent(this, Recipes.class);
-                intent.putExtra("connection", conectionBD);
-                startActivity(intent);
-            }
-
-            return true;
-        });
-    }
-
     public void addPlate() {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         View dialogView = layoutInflater.inflate(R.layout.upload_plate, null);
+        List<String> getCategoryFromSpinner = new ArrayList<>();
+
+        Spinner spinner = dialogView.findViewById(R.id.spinner);
+        categories = conectionBD.getNameCategories(new ConectionBD.OnDataLoadedListener() {
+            @Override
+            public void onDataLoaded() {
+                setupSpinner(categories, spinner);
+            }
+        });
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                getCategoryFromSpinner.add(0, (String) parent.getItemAtPosition(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         builder.setView(dialogView).setTitle("Agregar plato")
                 .setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        EditText categoria = dialogView.findViewById(R.id.textCategoria);
                         EditText plato = dialogView.findViewById(R.id.textPlato);
 
-                        String cat = String.valueOf(categoria.getText()).toLowerCase().trim();
+
+                        String cat = getCategoryFromSpinner.get(0);
                         String plate = String.valueOf(plato.getText()).trim();
 
                         if (cat.isEmpty() || plate.isEmpty()) {
@@ -227,55 +211,19 @@ public class logged extends AppCompatActivity {
         alertDialog.show();
     }
 
-    /*public void addPlate(){
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater layoutInflater = this.getLayoutInflater();
-        View dialogView = layoutInflater.inflate(R.layout.upload_plate, null);
-
-        builder.setView(dialogView).setTitle("Agregar plato")
-                .setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EditText categoria = dialogView.findViewById(R.id.textCategoria);
-                        EditText plato = dialogView.findViewById(R.id.textPlato);
-
-                        String cat = String.valueOf(categoria.getText()).toLowerCase();
-                        String plate = String.valueOf(plato.getText());
-
-                        DatabaseReference dbr = ref.child(userId).child("categorias").child(cat);
-
-                        dbr.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.exists()){
-                                    dbr.child(plate).setValue("");
-                                    Toast.makeText(logged.this, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
-                                    updateUser();
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                Toast.makeText(logged.this, "Fallo en la subida del plato", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                })
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }*/
-
     private void updateUser() {
         conectionBD.getCategoriesFromDb();
+    }
+
+    public void setupSpinner(List<String> categories, Spinner spinner){
+        ArrayAdapter<String> adapterCategories = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                categories
+        );
+
+        adapterCategories.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapterCategories);
     }
 
     private void addUserToDb() {

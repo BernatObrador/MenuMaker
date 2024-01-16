@@ -7,11 +7,9 @@ import java.util.List;
 public class User implements Serializable {
     private String userId;
     private String email;
-    //private List<Category> categories;
     private List<Plate> plates;
 
     public User() {
-        //categories = new ArrayList<>();
         plates = new ArrayList<>();
     }
 
@@ -27,6 +25,17 @@ public class User implements Serializable {
             }
         }
         return -1;
+    }
+
+    public List<String> getCategories(){
+        List<String> categories = new ArrayList<>();
+        for(Plate p : plates){
+            if (!categories.contains(p.getCategory())){
+                categories.add(p.getCategory());
+            }
+        }
+
+        return categories;
     }
 
     public void addPlate(Plate plate){
