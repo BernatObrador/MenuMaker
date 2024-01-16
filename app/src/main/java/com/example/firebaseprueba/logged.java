@@ -55,6 +55,7 @@ public class logged extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private List<String> categories;
+    private RecyclerViewAdapterCategory recyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,8 @@ public class logged extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
         addUserToDb();
 
+
+
         ImageView addButon = findViewById(R.id.addButton);
         conectionBD = new ConectionBD(database, userId);
 
@@ -92,6 +95,13 @@ public class logged extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addPlate();
+            }
+        });
+
+        categories = conectionBD.getNameCategories(new ConectionBD.OnDataLoadedListener() {
+            @Override
+            public void onDataLoaded() {
+                setUpRecyclerView();
             }
         });
 
@@ -248,6 +258,13 @@ public class logged extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void setUpRecyclerView(){
+        RecyclerView recyclerView = findViewById(R.id.recyclerCategories);
+        recyclerViewAdapter = new RecyclerViewAdapterCategory(this, categories);
+        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
 }

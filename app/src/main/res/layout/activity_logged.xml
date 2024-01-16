@@ -30,7 +30,7 @@
                 android:id="@+id/crearMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="200dp"
+                android:layout_marginTop="100dp"
                 android:text="@string/crear_menu"
                 android:textAlignment="center"
                 android:textSize="30sp"
@@ -68,8 +68,9 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerCategories"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp">
 
             </androidx.recyclerview.widget.RecyclerView>
 
