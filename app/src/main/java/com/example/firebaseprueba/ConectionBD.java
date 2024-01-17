@@ -24,6 +24,10 @@ public class ConectionBD implements Serializable {
         void onDataLoaded();
     }
 
+    public interface OnCantidadPlatosCategoriaListener {
+        void onCantidadPlatosCategoria(int cantidad);
+    }
+
     public ConectionBD(FirebaseDatabase database, String userId) {
         ConectionBD.database = database;
         user = new User();
@@ -154,10 +158,12 @@ public class ConectionBD implements Serializable {
         return cat;
     }
 
-    public void agregarPlato(String plate, String cat, DatabaseReference categoriaRef, Context context){
+    public boolean agregarPlato(String plate, String cat, DatabaseReference categoriaRef, Context context){
+        boolean[] agregado = new boolean[1];
+
         if (cat.isEmpty() || plate.isEmpty()) {
             Toast.makeText(context, "Ingrese una categoría y un plato válidos", Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
 
         categoriaRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -169,7 +175,7 @@ public class ConectionBD implements Serializable {
                     } else {
                         categoriaRef.child(plate).setValue("");
                         Toast.makeText(context, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
-                        getCategoriesFromDb();
+                        agregado[0] = true;
                     }
                 } else {
                     Toast.makeText(context, "La categoría no existe", Toast.LENGTH_SHORT).show();
@@ -181,6 +187,30 @@ public class ConectionBD implements Serializable {
 
             }
         });
+
+        return agregado[0];
+    }
+
+    public void getCantidadPlatosCategoria(String categoria, OnCantidadPlatosCategoriaListener listener){
+        DatabaseReference dbr = database.getReference("MenuMaker").child(user.getUserId()).child("categorias").child(categoria);
+
+        dbr.addListenerForSingleValueEvent(new ValueEventListener() {
+            int cantidad = 0;
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot snapshot1 : snapshot.getChildren()){
+                    cantidad++;
+                }
+
+                listener.onCantidadPlatosCategoria(cantidad);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
 

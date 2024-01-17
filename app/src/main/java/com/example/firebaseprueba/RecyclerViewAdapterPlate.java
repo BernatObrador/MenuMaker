@@ -66,8 +66,9 @@ public class RecyclerViewAdapterPlate extends RecyclerView.Adapter<RecyclerViewA
                 .child(plate.getName());
 
         ref.removeValue();
-        plates.remove(pos);
+        plates.remove(plate);
         notifyItemRemoved(pos);
+        notifyDataSetChanged();
         Toast.makeText(context, "Plato eliminado correctamente", Toast.LENGTH_SHORT).show();
         return true;
     }

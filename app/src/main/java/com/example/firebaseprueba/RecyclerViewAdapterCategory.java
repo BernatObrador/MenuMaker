@@ -20,11 +20,13 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
     private final Context context;
     private final List<String> categories;
     private final HashMap<String, Integer> cantidadCat;
+    private ConectionBD conectionBD;
 
-    public RecyclerViewAdapterCategory(Context context, List<String> categories) {
+    public RecyclerViewAdapterCategory(Context context, List<String> categories, ConectionBD conectionBD) {
         this.context = context;
         this.categories = categories;
         this.cantidadCat = new HashMap<>();
+        this.conectionBD = conectionBD;
     }
 
     @NonNull
@@ -38,22 +40,31 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewAdapterCategory.MyHolder holder, @SuppressLint("RecyclerView") int position) {
-        holder.nombreCat.setText(categories.get(position));
+        String categoria = categories.get(position);
+        holder.nombreCat.setText(categoria);
+        final int[] cantidadDePlatosCategoria = {0};
+
+        conectionBD.getCantidadPlatosCategoria(categoria, new ConectionBD.OnCantidadPlatosCategoriaListener() {
+            @Override
+            public void onCantidadPlatosCategoria(int cantidad) {
+                cantidadDePlatosCategoria[0] = cantidad;
+            }
+        });
 
         holder.arrowUp.setOnClickListener(v -> {
-            if (cantidadDePlatos() < 5) {
+
+            if (cantidadDePlatos() < 5 && Integer.parseInt((String) holder.cantidadCat.getText()) < cantidadDePlatosCategoria[0]) {
                 int quantity = sumQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
                 holder.cantidadCat.setText(String.valueOf(quantity));
-                cantidadCat.put(categories.get(position), Integer.parseInt(holder.cantidadCat.getText().toString()));
-            } else {
-                Toast.makeText(context, "No puedes poner mas de 5 platos.", Toast.LENGTH_SHORT).show();
+                cantidadCat.put(categoria, Integer.parseInt(holder.cantidadCat.getText().toString()));
             }
+
         });
 
         holder.arrowDwn.setOnClickListener(v -> {
             int qunatity = downQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
             holder.cantidadCat.setText(String.valueOf(qunatity));
-            cantidadCat.put(categories.get(position), Integer.parseInt(holder.cantidadCat.getText().toString()));
+            cantidadCat.put(categoria, Integer.parseInt(holder.cantidadCat.getText().toString()));
         });
     }
 
@@ -81,6 +92,7 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
         for(Map.Entry<String, Integer> entry : cantidadCat.entrySet()) {
             count += entry.getValue();
         }
+
         return count;
     }
 

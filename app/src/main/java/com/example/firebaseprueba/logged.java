@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -90,6 +91,8 @@ public class logged extends AppCompatActivity {
             @Override
             public void onDataLoaded() {
                 setUpRecyclerView();
+                ProgressBar progressBar = findViewById(R.id.loading);
+                progressBar.setVisibility(View.GONE);
             }
         });
 
@@ -99,6 +102,7 @@ public class logged extends AppCompatActivity {
         if (conectionBD.getUser().getPlates().size() > 0) {
             TextView textMenu = findViewById(R.id.menu);
             List<Plate> menu = generateMenu.getMenuForCat(recyclerViewAdapter.getCantidadCat());
+
             Collections.shuffle(menu);
             String menuTxt = "";
             for (int i = 0; i < menu.size(); i++) {
@@ -123,6 +127,7 @@ public class logged extends AppCompatActivity {
             }
 
             textMenu.setText(menuTxt);
+
         } else {
             Toast.makeText(logged.this, "No tienes platos para crear el menu.", Toast.LENGTH_SHORT).show();
         }
@@ -160,39 +165,14 @@ public class logged extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         EditText plato = dialogView.findViewById(R.id.textPlato);
-
-
                         String cat = getCategoryFromSpinner.get(0);
                         String plate = String.valueOf(plato.getText()).trim();
 
-
                         DatabaseReference categoriaRef = ref.child(userId).child("categorias").child(cat);
 
-                        conectionBD.agregarPlato(plate, cat, categoriaRef, logged.this);
-                        /*
-                        categoriaRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.exists()) {
-                                    if (snapshot.child(plate).exists()) {
-                                        Toast.makeText(logged.this, "El plato ya existe en esta categoría", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        categoriaRef.child(plate).setValue("");
-                                        Toast.makeText(logged.this, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
-                                        updateUser();
-                                    }
-                                } else {
-                                    Toast.makeText(logged.this, "La categoría no existe", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                Toast.makeText(logged.this, "Fallo en la subida del plato", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
- */
+                        if(conectionBD.agregarPlato(plate, cat, categoriaRef, logged.this)){
+                            updateUser();
+                        }
                     }
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -247,7 +227,7 @@ public class logged extends AppCompatActivity {
 
     private void setUpRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.recyclerCategories);
-        recyclerViewAdapter = new RecyclerViewAdapterCategory(this, categories);
+        recyclerViewAdapter = new RecyclerViewAdapterCategory(this, categories, conectionBD);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }

@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -55,6 +56,8 @@ public class Recipes extends AppCompatActivity {
                 startComponents();
                 plates = conectionBD.getUser().getPlates();
                 updateUi();
+                ProgressBar progressBar = findViewById(R.id.loading);
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -121,10 +124,6 @@ public class Recipes extends AppCompatActivity {
                         String cat = getCategoryFromSpinner.get(0);
                         String plate = String.valueOf(plato.getText()).trim();
 
-                        if (cat.isEmpty() || plate.isEmpty()) {
-                            Toast.makeText(Recipes.this, "Ingrese una categoría y un plato válidos", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
 
                         DatabaseReference categoriaRef = ref.child(userId).child("categorias").child(cat);
 
@@ -150,8 +149,11 @@ public class Recipes extends AppCompatActivity {
                                 Toast.makeText(Recipes.this, "Fallo en la subida del plato", Toast.LENGTH_SHORT).show();
                             }
                         });
+
                     }
+
                 })
+
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

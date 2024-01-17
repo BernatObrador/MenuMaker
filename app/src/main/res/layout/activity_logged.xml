@@ -7,15 +7,23 @@
     android:background="#FFFAF0"
     tools:context=".logged">
 
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="226dp"
+        android:layout_height="188dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="400dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="90dp">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
+            android:id="@+id/linearLay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
