@@ -33,7 +33,6 @@ import java.util.Objects;
 
 public class Recipes extends AppCompatActivity {
     private ConectionBD conectionBD;
-    private User actualUser;
     private List<Plate> plates;
     private FirebaseDatabase database;
     private DatabaseReference ref;
@@ -54,8 +53,7 @@ public class Recipes extends AppCompatActivity {
             @Override
             public void onDataLoaded() {
                 startComponents();
-                actualUser = conectionBD.getUser();
-                plates = actualUser.getPlates();
+                plates = conectionBD.getUser().getPlates();
                 updateUi();
             }
         });
@@ -80,7 +78,7 @@ public class Recipes extends AppCompatActivity {
 
     private void updateUi(){
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerViewAdapter = new RecyclerViewAdapterPlate(this, plates);
+        recyclerViewAdapter = new RecyclerViewAdapterPlate(this, plates, conectionBD);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }

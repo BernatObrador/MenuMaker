@@ -65,15 +65,10 @@ public class ConectionBD implements Serializable {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Plate> plates = new ArrayList<>();
-                Plate plate = null;
-                //Category category = null;
                 for(DataSnapshot categoria : snapshot.getChildren()){
-                    //category = new Category(categoria.getKey());
                     for(DataSnapshot plato : categoria.getChildren()){
                         plates.add(new Plate(plato.getKey(), categoria.getKey()));
-                        //category.addPlate(plato.getKey());
                     }
-                    //user.addCategory(category);
                 }
                 user.setPlates(plates);
 

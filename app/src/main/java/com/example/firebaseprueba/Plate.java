@@ -1,14 +1,13 @@
 package com.example.firebaseprueba;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class Plate implements Comparable<Plate>, Serializable {
     private String name;
     private String category;
 
-    public Plate(String category) {
-        this.category = category;
-    }
 
     public Plate(String name, String category) {
         this.name = name;
@@ -31,6 +30,7 @@ public class Plate implements Comparable<Plate>, Serializable {
         this.category = category;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Plate{" +
