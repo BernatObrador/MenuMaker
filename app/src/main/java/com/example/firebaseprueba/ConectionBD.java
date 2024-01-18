@@ -23,7 +23,6 @@ public class ConectionBD implements Serializable {
     public interface OnDataLoadedListener{
         void onDataLoaded();
     }
-
     public interface OnCantidadPlatosCategoriaListener {
         void onCantidadPlatosCategoria(int cantidad);
     }
@@ -46,10 +45,11 @@ public class ConectionBD implements Serializable {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Plate> plates = new ArrayList<>();
-                Plate plate = null;
                 for(DataSnapshot categoria : snapshot.getChildren()){
                     for(DataSnapshot plato : categoria.getChildren()){
-                        plates.add(new Plate(plato.getKey(), categoria.getKey()));
+                        if (!plato.getKey().equals("stopDelete") && !categoria.getKey().equals("stopDelete")) {
+                            plates.add(new Plate(plato.getKey(), categoria.getKey()));
+                        }
                     }
                 }
                 user.setPlates(plates);
@@ -71,7 +71,9 @@ public class ConectionBD implements Serializable {
                 List<Plate> plates = new ArrayList<>();
                 for(DataSnapshot categoria : snapshot.getChildren()){
                     for(DataSnapshot plato : categoria.getChildren()){
-                        plates.add(new Plate(plato.getKey(), categoria.getKey()));
+                        if (!plato.getKey().equals("stopDelete") && !categoria.getKey().equals("stopDelete")) {
+                            plates.add(new Plate(plato.getKey(), categoria.getKey()));
+                        }
                     }
                 }
                 user.setPlates(plates);
@@ -88,52 +90,6 @@ public class ConectionBD implements Serializable {
         });
     }
 
-    public int getCountCategories(){
-
-        DatabaseReference dbr = database.getReference("MenuMaker").child(user.getUserId()).child("categorias");
-        final int[] countCat = {0};
-        dbr.addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot categoria : snapshot.getChildren()){
-                    countCat[0]++;
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        return countCat[0];
-    }
-
-    public int getCountCategories(String cat){
-
-        DatabaseReference dbr = database.getReference("MenuMaker").child(user.getUserId()).child("categorias").child(cat);
-        final int[] countCat = {0};
-        dbr.addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot categoria : snapshot.getChildren()){
-                    countCat[0]++;
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        return countCat[0];
-    }
-
     public List<String> getNameCategories(OnDataLoadedListener listener){
         DatabaseReference dbr = database.getReference("MenuMaker").child(user.getUserId()).child("categorias");
         List<String> cat = new ArrayList<>();
@@ -142,8 +98,11 @@ public class ConectionBD implements Serializable {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot categoria : snapshot.getChildren()){
-                    cat.add(categoria.getKey());
+                    if (!categoria.getKey().equals("stopDelete")) {
+                        cat.add(categoria.getKey());
+                    }
                 }
+
                 if(listener != null){
                     listener.onDataLoaded();
                 }
@@ -156,10 +115,10 @@ public class ConectionBD implements Serializable {
         });
 
         return cat;
+
     }
 
     public boolean agregarPlato(String plate, String cat, DatabaseReference categoriaRef, Context context){
-        boolean[] agregado = new boolean[1];
 
         if (cat.isEmpty() || plate.isEmpty()) {
             Toast.makeText(context, "Ingrese una categoría y un plato válidos", Toast.LENGTH_SHORT).show();
@@ -175,7 +134,6 @@ public class ConectionBD implements Serializable {
                     } else {
                         categoriaRef.child(plate).setValue("");
                         Toast.makeText(context, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
-                        agregado[0] = true;
                     }
                 } else {
                     Toast.makeText(context, "La categoría no existe", Toast.LENGTH_SHORT).show();
@@ -188,7 +146,7 @@ public class ConectionBD implements Serializable {
             }
         });
 
-        return agregado[0];
+        return true;
     }
 
     public void getCantidadPlatosCategoria(String categoria, OnCantidadPlatosCategoriaListener listener){
@@ -198,8 +156,10 @@ public class ConectionBD implements Serializable {
             int cantidad = 0;
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot snapshot1 : snapshot.getChildren()){
-                    cantidad++;
+                for(DataSnapshot plate : snapshot.getChildren()){
+                    if (!plate.getKey().equals("stopDelete")) {
+                        cantidad++;
+                    }
                 }
 
                 listener.onCantidadPlatosCategoria(cantidad);

@@ -31,7 +31,7 @@ public class Utilities {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(context, "Logged out", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(context, MainActivity.class);
+                        Intent intent = new Intent(context, LogIn.class);
                         context.startActivity(intent);
                     } else {
                         Toast.makeText(context, "Failed at logging out", Toast.LENGTH_SHORT).show();
@@ -50,7 +50,7 @@ public class Utilities {
 
         navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == (R.id.pagPrincipal)){
-                Intent intent = new Intent(activity, logged.class);
+                Intent intent = new Intent(activity, MainActivity.class);
                 activity.startActivity(intent);
                 return true;
             }
@@ -59,18 +59,13 @@ public class Utilities {
                 return true;
             }
             if (item.getItemId() == (R.id.mostrarPlatos)) {
-                Intent intent = new Intent(activity, Recipes.class);
+                Intent intent = new Intent(activity, TusPlatos.class);
                 intent.putExtra("connection", conectionBD);
                 activity.startActivity(intent);
                 return true;
             }
             return true;
         });
-    }
-
-    private static User updateUser(ConectionBD connectionBD){
-        connectionBD.getCategoriesFromDb();
-        return connectionBD.getUser();
     }
 }
 

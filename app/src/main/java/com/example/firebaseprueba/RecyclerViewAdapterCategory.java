@@ -2,15 +2,18 @@ package com.example.firebaseprueba;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.database.DatabaseReference;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,13 +22,13 @@ import java.util.Map;
 public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerViewAdapterCategory.MyHolder> {
     private final Context context;
     private final List<String> categories;
-    private final HashMap<String, Integer> cantidadCat;
+    private final HashMap<String, Integer> cantidadPorCategoria;
     private ConectionBD conectionBD;
 
     public RecyclerViewAdapterCategory(Context context, List<String> categories, ConectionBD conectionBD) {
         this.context = context;
         this.categories = categories;
-        this.cantidadCat = new HashMap<>();
+        this.cantidadPorCategoria = new HashMap<>();
         this.conectionBD = conectionBD;
     }
 
@@ -56,15 +59,42 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
             if (cantidadDePlatos() < 5 && Integer.parseInt((String) holder.cantidadCat.getText()) < cantidadDePlatosCategoria[0]) {
                 int quantity = sumQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
                 holder.cantidadCat.setText(String.valueOf(quantity));
-                cantidadCat.put(categoria, Integer.parseInt(holder.cantidadCat.getText().toString()));
+                cantidadPorCategoria.put(categoria, Integer.parseInt(holder.cantidadCat.getText().toString()));
             }
-
         });
 
         holder.arrowDwn.setOnClickListener(v -> {
             int qunatity = downQuantity(Integer.parseInt(holder.cantidadCat.getText().toString()));
             holder.cantidadCat.setText(String.valueOf(qunatity));
-            cantidadCat.put(categoria, Integer.parseInt(holder.cantidadCat.getText().toString()));
+            cantidadPorCategoria.put(categoria, Integer.parseInt(holder.cantidadCat.getText().toString()));
+        });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+                builder.setTitle("Estas seguro que quieres eliminar la categoria " + categories.get(position) + " y todos sus platos?")
+                        .setPositiveButton("Eliminar", (dialog, which) -> {
+                            DatabaseReference ref = ConectionBD.getDatabase()
+                                    .getReference("MenuMaker")
+                                    .child(conectionBD.getUser().getUserId())
+                                    .child("categorias")
+                                    .child(categories.get(position));
+
+                            ref.removeValue();
+                            categories.remove(position);
+                            notifyItemRemoved(position);
+                            notifyDataSetChanged();
+                        }).setNegativeButton("Cancelar", (dialog, which) -> {
+
+                        });
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+                return true;
+            }
         });
     }
 
@@ -89,15 +119,15 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
     public int cantidadDePlatos(){
         int count = 0;
 
-        for(Map.Entry<String, Integer> entry : cantidadCat.entrySet()) {
+        for(Map.Entry<String, Integer> entry : cantidadPorCategoria.entrySet()) {
             count += entry.getValue();
         }
 
         return count;
     }
 
-    public HashMap<String, Integer> getCantidadCat() {
-        return cantidadCat;
+    public HashMap<String, Integer> getCantidadPorCategoria() {
+        return cantidadPorCategoria;
     }
 
     @Override

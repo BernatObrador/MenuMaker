@@ -30,9 +30,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-public class Recipes extends AppCompatActivity {
+public class TusPlatos extends AppCompatActivity {
     private ConectionBD conectionBD;
     private List<Plate> plates;
     private FirebaseDatabase database;
@@ -69,13 +68,9 @@ public class Recipes extends AppCompatActivity {
         NavigationView navigationView = findViewById(R.id.navView);
         Utilities.setupMenu(this, toolbar, drawerLayout, navigationView, conectionBD);
         FloatingActionButton addButon = findViewById(R.id.addButton);
-        addButon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addPlate();
-            }
-        });
-
+        addButon.setOnClickListener(v -> addPlate());
+        FloatingActionButton addCatButton = findViewById(R.id.addCategoryButton);
+        addCatButton.setOnClickListener( v -> addCategory());
 
     }
 
@@ -92,21 +87,16 @@ public class Recipes extends AppCompatActivity {
         View dialogView = layoutInflater.inflate(R.layout.upload_plate, null);
         String userId = conectionBD.getUser().getUserId();
 
+
         List<String> getCategoryFromSpinner = new ArrayList<>();
 
         Spinner spinner = dialogView.findViewById(R.id.spinner);
-        categories = conectionBD.getNameCategories(new ConectionBD.OnDataLoadedListener() {
-            @Override
-            public void onDataLoaded() {
-                setupSpinner(categories, spinner);
-            }
-        });
+        categories = conectionBD.getNameCategories(() -> setupSpinner(categories, spinner));
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 getCategoryFromSpinner.add(0, (String) parent.getItemAtPosition(position));
-                Log.d("cat", getCategoryFromSpinner.toString());
             }
 
             @Override
@@ -115,50 +105,97 @@ public class Recipes extends AppCompatActivity {
             }
         });
 
+
         builder.setView(dialogView).setTitle("Agregar plato")
-                .setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EditText plato = dialogView.findViewById(R.id.textPlato);
+                .setPositiveButton("Guardar", (dialog, which) -> {
+                    EditText plato = dialogView.findViewById(R.id.textPlato);
 
-                        String cat = getCategoryFromSpinner.get(0);
-                        String plate = String.valueOf(plato.getText()).trim();
+                    String cat = getCategoryFromSpinner.get(0);
+                    String plate = String.valueOf(plato.getText()).trim();
 
 
-                        DatabaseReference categoriaRef = ref.child(userId).child("categorias").child(cat);
+                    DatabaseReference categoriaRef = ref.child(userId).child("categorias").child(cat);
 
-                        categoriaRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.exists()) {
-                                    if (snapshot.child(plate).exists()) {
-                                        Toast.makeText(Recipes.this, "El plato ya existe en esta categoría", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        categoriaRef.child(plate).setValue("");
-                                        plates.add(new Plate(plate, cat));
-                                        Toast.makeText(Recipes.this, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
-                                        recyclerViewAdapter.notifyItemInserted(plates.size() - 1);
-                                    }
+                    categoriaRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                if (snapshot.child(plate).exists()) {
+                                    Toast.makeText(TusPlatos.this, "El plato ya existe en esta categoría", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(Recipes.this, "La categoría no existe", Toast.LENGTH_SHORT).show();
+                                    categoriaRef.child(plate).setValue("");
+                                    plates.add(new Plate(plate, cat));
+                                    Toast.makeText(TusPlatos.this, "Plato subido correctamente", Toast.LENGTH_SHORT).show();
+                                    recyclerViewAdapter.notifyItemInserted(plates.size() - 1);
                                 }
+                            } else {
+                                Toast.makeText(TusPlatos.this, "La categoría no existe", Toast.LENGTH_SHORT).show();
                             }
+                        }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                Toast.makeText(Recipes.this, "Fallo en la subida del plato", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                    }
-
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(TusPlatos.this, "Fallo en la subida del plato", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 })
 
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                .setNegativeButton("Cancelar", (dialog, which) -> {
 
-                    }
+                });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public void addCategory(){
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View dialogView = layoutInflater.inflate(R.layout.upload_category, null);
+        String userId = conectionBD.getUser().getUserId();
+
+        EditText cateogriaEdit = dialogView.findViewById(R.id.textAddCategory);
+
+        categories = conectionBD.getNameCategories(new ConectionBD.OnDataLoadedListener() {
+            @Override
+            public void onDataLoaded() {
+
+            }
+        });
+
+
+        DatabaseReference reference = ref.child(userId).child("categorias");
+
+        builder.setView(dialogView).setTitle("Agregar categoria")
+                .setPositiveButton("Guardar", (dialog, which) -> {
+                    String cat = cateogriaEdit.getText().toString().trim();
+                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (cat.isEmpty()) {
+                                if (!snapshot.child(cat).exists()) {
+                                    reference.child(cat).child("stopDelete").setValue("");
+                                    Toast.makeText(TusPlatos.this, "Categoria subida correctamente.", Toast.LENGTH_SHORT).show();
+                                    categories.add(cat);
+                                    recyclerViewAdapter.notifyItemInserted(categories.size() - 1);
+                                } else {
+                                    Toast.makeText(TusPlatos.this, "Categoria ya existente.", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(TusPlatos.this, "Introduce una categoria..", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                }).setNegativeButton("Cancelar", (dialog, which) -> {
+
                 });
 
         AlertDialog alertDialog = builder.create();

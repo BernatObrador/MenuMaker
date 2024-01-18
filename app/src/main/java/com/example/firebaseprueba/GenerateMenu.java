@@ -1,6 +1,7 @@
 package com.example.firebaseprueba;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,11 +9,9 @@ import java.util.Map;
 public class GenerateMenu {
 
     private User user;
-    private ConectionBD conectionBD;
 
-    public GenerateMenu(User user , ConectionBD conectionBD) {
+    public GenerateMenu(User user ) {
         this.user = user;
-        this.conectionBD = conectionBD;
     }
     public List<Plate> getMenuForCat(HashMap<String, Integer> cantidadPorCategoria){
         HashMap<String, List<Plate>> categories = new HashMap<>();

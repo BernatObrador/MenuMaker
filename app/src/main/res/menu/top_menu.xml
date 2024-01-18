@@ -6,10 +6,10 @@
 
             <item
                 android:id="@+id/pagPrincipal"
-                android:title="@string/main_page" />
+                android:title="@string/pagina_principal" />
             <item
                 android:id="@+id/mostrarPlatos"
-                android:title="@string/plates" />
+                android:title="@string/tus_platos" />
 
         </menu>
     </item>
