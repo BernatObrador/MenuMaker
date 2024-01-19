@@ -69,33 +69,37 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
             cantidadPorCategoria.put(categoria, Integer.parseInt(holder.cantidadCat.getText().toString()));
         });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
-            public boolean onLongClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-                builder.setTitle("Estas seguro que quieres eliminar la categoria " + categories.get(position) + " y todos sus platos?")
-                        .setPositiveButton("Eliminar", (dialog, which) -> {
-                            DatabaseReference ref = ConectionBD.getDatabase()
-                                    .getReference("MenuMaker")
-                                    .child(conectionBD.getUser().getUserId())
-                                    .child("categorias")
-                                    .child(categories.get(position));
-
-                            ref.removeValue();
-                            categories.remove(position);
-                            notifyItemRemoved(position);
-                            notifyDataSetChanged();
-                        }).setNegativeButton("Cancelar", (dialog, which) -> {
-
-                        });
-
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-
-                return true;
+            public void onClick(View v) {
+                onClickDelete(position, holder);
             }
         });
+    }
+
+    private void onClickDelete(int position, MyHolder holder){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle("Estas seguro que quieres eliminar la categoria " + categories.get(position) + " y todos sus platos?")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
+                    DatabaseReference ref = ConectionBD.getDatabase()
+                            .getReference("MenuMaker")
+                            .child(conectionBD.getUser().getUserId())
+                            .child("categorias")
+                            .child(categories.get(position));
+
+                    holder.cantidadCat.setText("0");
+                    ref.removeValue();
+                    categories.remove(position);
+                    notifyItemRemoved(position);
+                    notifyDataSetChanged();
+                }).setNegativeButton("Cancelar", (dialog, which) -> {
+
+                });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private int downQuantity(int numero){
@@ -140,12 +144,14 @@ public class RecyclerViewAdapterCategory extends RecyclerView.Adapter<RecyclerVi
         private final ImageView arrowUp;
         private final ImageView arrowDwn;
         private final TextView cantidadCat;
+        private final ImageView deleteBtn;
         public MyHolder(@NonNull View itemView) {
             super(itemView);
             nombreCat = itemView.findViewById(R.id.textCategory);
             arrowUp = itemView.findViewById(R.id.arrowUp);
             arrowDwn = itemView.findViewById(R.id.arrowDwn);
             cantidadCat = itemView.findViewById(R.id.cantidadCategoria);
+            deleteBtn = itemView.findViewById(R.id.deleteBtn);
         }
     }
 }

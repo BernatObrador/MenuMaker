@@ -169,11 +169,11 @@ public class TusPlatos extends AppCompatActivity {
 
         builder.setView(dialogView).setTitle("Agregar categoria")
                 .setPositiveButton("Guardar", (dialog, which) -> {
-                    String cat = cateogriaEdit.getText().toString().trim();
+                    String cat = cateogriaEdit.getText().toString();
                     reference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (cat.isEmpty()) {
+                            if (!cat.isEmpty()) {
                                 if (!snapshot.child(cat).exists()) {
                                     reference.child(cat).child("stopDelete").setValue("");
                                     Toast.makeText(TusPlatos.this, "Categoria subida correctamente.", Toast.LENGTH_SHORT).show();
@@ -183,7 +183,7 @@ public class TusPlatos extends AppCompatActivity {
                                     Toast.makeText(TusPlatos.this, "Categoria ya existente.", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
-                                Toast.makeText(TusPlatos.this, "Introduce una categoria..", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(TusPlatos.this, "Introduce una categoria.", Toast.LENGTH_SHORT).show();
                             }
 
                         }

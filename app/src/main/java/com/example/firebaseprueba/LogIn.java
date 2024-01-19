@@ -41,6 +41,12 @@ public class LogIn extends AppCompatActivity {
 
         startComponents();
 
+        if (firebaseAuth.getCurrentUser() != null) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+            return;
+        }
+
         signIn();
 
         signUp();

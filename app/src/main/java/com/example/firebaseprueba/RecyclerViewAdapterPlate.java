@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,11 +47,10 @@ public class RecyclerViewAdapterPlate extends RecyclerView.Adapter<RecyclerViewA
         holder.plato.setText(plates.get(position).getName());
         holder.categoria.setText(plates.get(position).getCategory());
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-
-                return onLongClickDelete(position);
+            public void onClick(View v) {
+                onClickDelete(position);
             }
         });
     }
@@ -61,7 +61,7 @@ public class RecyclerViewAdapterPlate extends RecyclerView.Adapter<RecyclerViewA
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private boolean onLongClickDelete(int pos){
+    private void onClickDelete(int pos){
         Plate plate = plates.get(pos);
 
         FirebaseDatabase database = ConectionBD.getDatabase();
@@ -75,18 +75,19 @@ public class RecyclerViewAdapterPlate extends RecyclerView.Adapter<RecyclerViewA
         notifyItemRemoved(pos);
         notifyDataSetChanged();
         Toast.makeText(context, "Plato eliminado correctamente", Toast.LENGTH_SHORT).show();
-        return true;
     }
 
     public static class MyHolder extends RecyclerView.ViewHolder {
 
         private final TextView plato;
         private final TextView categoria;
+        private final ImageView deleteBtn;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
             plato = itemView.findViewById(R.id.nombrePlato);
             categoria = itemView.findViewById(R.id.nombreCat);
+            deleteBtn = itemView.findViewById(R.id.deleteBtn);
         }
     }
 }

@@ -6,36 +6,37 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="10dp"
     android:padding="5dp"
-    android:background="@color/white">
+    android:background="#E0F1FF">
 
     <LinearLayout
         android:id="@+id/linearCat"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="5dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        tools:ignore="MissingConstraints">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/categoria"
-            android:textSize="25sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            android:textSize="25sp"/>
 
         <TextView
             android:id="@+id/nombreCat"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_gravity="center"
             android:layout_marginStart="10dp"
             android:text="@string/placeholder"
-            android:textAlignment="viewStart"
-            android:textSize="25sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nombrePlato" />
+            android:textSize="25sp"/>
 
+        <ImageView
+            android:id="@+id/deleteBtn"
+            android:layout_width="36dp"
+            android:layout_height="33dp"
+            android:src="@drawable/delete_btn"
+            android:layout_gravity="end"/>
     </LinearLayout>
 
 
@@ -59,12 +60,12 @@
 
         <TextView
             android:id="@+id/nombrePlato"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginStart="60dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
             android:text="@string/placeholder"
-            android:textAlignment="viewStart"
             android:textSize="25sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

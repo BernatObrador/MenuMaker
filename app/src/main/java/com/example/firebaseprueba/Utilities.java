@@ -1,10 +1,17 @@
 package com.example.firebaseprueba;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,6 +22,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Utilities {
 
@@ -67,5 +81,51 @@ public class Utilities {
             return true;
         });
     }
+/*
+        public void addPlate() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View dialogView = layoutInflater.inflate(R.layout.upload_plate, null);
+        List<String> getCategoryFromSpinner = new ArrayList<>();
+
+        Spinner spinner = dialogView.findViewById(R.id.spinner);
+
+        categories = conectionBD.getNameCategories(() -> setupSpinner(categories, spinner));
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                getCategoryFromSpinner.add(0, (String) parent.getItemAtPosition(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        builder.setView(dialogView).setTitle("Agregar plato")
+                .setPositiveButton("Guardar", (dialog, which) -> {
+
+                    EditText plato = dialogView.findViewById(R.id.textPlato);
+                    String cat = getCategoryFromSpinner.get(0);
+                    String plate = String.valueOf(plato.getText()).trim();
+
+                    DatabaseReference categoriaRef = ref.child(userId).child("categorias").child(cat);
+
+                    if(conectionBD.agregarPlato(plate, cat, categoriaRef, MainActivity.this)){
+                        updateUser();
+                    }
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> {
+
+                });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+ */
 }
 

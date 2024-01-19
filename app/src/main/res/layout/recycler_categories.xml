@@ -9,29 +9,26 @@
 
     <TextView
         android:id="@+id/textCategory"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="10dp"
+        android:gravity="start"
         android:padding="5dp"
-        android:text="Prueba"
         android:textSize="22sp"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/arrowUp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/arrowUp"
         android:layout_width="34dp"
         android:layout_height="34dp"
-        android:layout_marginStart="80dp"
+        android:layout_marginTop="6dp"
         android:src="@drawable/arrow_up"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.888" />
+        app:layout_constraintStart_toEndOf="@+id/textCategory"
+        app:layout_constraintTop_toTopOf="@+id/textCategory" />
 
     <TextView
         android:id="@+id/cantidadCategoria"
@@ -42,7 +39,7 @@
         android:text="@string/_0"
         android:textSize="22sp"
         app:layout_constraintStart_toEndOf="@+id/arrowUp"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
         android:id="@+id/arrowDwn"
@@ -52,6 +49,18 @@
         android:layout_marginTop="16dp"
         android:src="@drawable/arrow_down"
         app:layout_constraintStart_toEndOf="@+id/cantidadCategoria"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/deleteBtn"
+        android:layout_width="36dp"
+        android:layout_height="33dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/delete_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/arrowDwn"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
